@@ -23,39 +23,28 @@ Authors
 -------
 
 **Saif Hasan**
-
 **09005003**
-
 **Department of Computer Science and Engineering**
-
 **Indian Institute of Technology, Bombay**
-
 + http://www.cse.iitb.ac.in/~saifhhasan
-
 + http://facebook.com/saifhhasan
 
+
 **Sagar Chordia**
-
 **09005013**
-
 **Department of Computer Science and Engineering**
-
 **Indian Institute of Technology, Bombay**
+
 
 **Hemant Gangolia**
-
 **09005014**
-
 **Department of Computer Science and Engineering**
-
 **Indian Institute of Technology, Bombay**
 
+
 **Chinmay Chauhan**
-
 **09005010**
-
 **Department of Computer Science and Engineering**
-
 **Indian Institute of Technology, Bombay**
 
 
