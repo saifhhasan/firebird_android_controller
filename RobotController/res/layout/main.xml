@@ -14,7 +14,7 @@
           android:id="@+id/ImageView1"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          android:background="#aa0000" />
+          android:background="#ffffff" />
       
   </LinearLayout>
 
@@ -23,29 +23,17 @@
       android:layout_height="fill_parent"
       android:layout_weight="1" >
 
-
       <ToggleButton
           android:id="@+id/toggleVideo"
           android:layout_width="40dp"
           android:layout_height="30dp"
-          android:layout_alignParentTop="true"          
+          android:layout_alignParentTop="true"
           android:layout_centerHorizontal="true"
+          android:checked="false"
+          android:onClick="onToggleVideo"
           android:text="Video"
           android:textOff="Video"
-          android:textOn="Video"
-          android:checked="false"
-          android:onClick="onToggleVideo" />
-
-      <ToggleButton
-          android:id="@+id/toggleAudio"
-          android:layout_width="40dp"
-          android:layout_height="30dp"
-          android:layout_alignParentTop="true"
-          android:layout_alignTop="@+id/toggleVideo"
-          android:layout_toLeftOf="@+id/buttonLeft"
-          android:onClick="onToggleAudio"
-          android:checked="false"
-          android:text="Audio" />
+          android:textOn="Video" />
 
       <ToggleButton
           android:id="@+id/toggleBuzzer"
@@ -54,8 +42,8 @@
           android:layout_alignParentTop="true"
           android:layout_alignTop="@+id/toggleVideo"
           android:layout_toRightOf="@+id/buttonRight"
-          android:onClick="onToggleBuzzer"
           android:checked="false"
+          android:onClick="onToggleBuzzer"
           android:text="Buzzer" />
 
       <Button
@@ -73,8 +61,8 @@
           android:padding="10dp"
           android:text="Front"
           android:textSize="5pt" />
-      
-       <Button
+
+      <Button
           android:id="@+id/buttonDown"
           android:layout_width="60dp"
           android:layout_height="wrap_content"
@@ -87,17 +75,17 @@
           android:onClick="onButtonDownClicked"
           android:padding="10dp"
           android:text="Back"
-          android:textSize="5pt" />      
+          android:textSize="5pt" />
 
       <Button
           android:id="@+id/buttonRight"
           android:layout_width="60dp"
-          android:layout_height="wrap_content"          
+          android:layout_height="wrap_content"
+          android:layout_alignTop="@id/buttonDown"
           android:layout_marginBottom="2dp"
           android:layout_marginLeft="10dp"
-          android:layout_marginRight="2dp"          
+          android:layout_marginRight="2dp"
           android:layout_toRightOf="@id/buttonDown"
-          android:layout_alignTop="@id/buttonDown"
           android:layout_weight="1"
           android:background="#ffffff"
           android:onClick="onButtonRightClicked"
@@ -109,10 +97,10 @@
           android:id="@+id/buttonLeft"
           android:layout_width="60dp"
           android:layout_height="wrap_content"
-          android:layout_alignTop="@id/buttonDown"         
+          android:layout_alignTop="@id/buttonDown"
           android:layout_marginBottom="2dp"
           android:layout_marginLeft="2dp"
-          android:layout_marginRight="10dp"          
+          android:layout_marginRight="10dp"
           android:layout_toLeftOf="@id/buttonDown"
           android:layout_weight="1"
           android:background="#ffffff"
@@ -140,77 +128,13 @@
           android:text="Buzzer"
           android:textAppearance="?android:attr/textAppearanceSmall" />
 
-      <TextView
-          android:id="@+id/textAudio"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignLeft="@+id/toggleAudio"
-          android:layout_alignTop="@+id/textVideo"
-          android:layout_below="@+id/toggleAudio"
-          android:text="Audio"
-          android:textAppearance="?android:attr/textAppearanceSmall" />
-
-      <ToggleButton
-          android:id="@+id/Accelerometer"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignParentRight="true"
-          android:layout_below="@+id/buttonRight"
-          android:onClick="buttonAccelerometer"
-           />
-
-      <TextView
-          android:id="@+id/accelerometertext"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="5pt"
-          android:layout_alignBottom="@+id/Accelerometer"
-          android:layout_toLeftOf="@+id/Accelerometer"
-          android:text="Acceleromter"
-          android:textAppearance="?android:attr/textAppearanceSmall" />
-
-      <TextView
-          android:id="@+id/xbox"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignBaseline="@+id/accelerometertext"
-          android:layout_alignBottom="@+id/accelerometertext"
-          android:layout_alignLeft="@+id/textAudio"
-          android:text="x" />
-
-      <TextView
-          android:id="@+id/ybox"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignBaseline="@+id/accelerometertext"
-          android:layout_alignBottom="@+id/xbox"
-          android:layout_toRightOf="@+id/xbox"
-          android:text="y" />
-
-      <TextView
-          android:id="@+id/zbox"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignBaseline="@+id/accelerometertext"
-          android:layout_alignBottom="@+id/xbox"
-          android:layout_toLeftOf="@+id/xbox"
-          android:text="z" />
-      <TextView
-          android:id="@+id/cmdbox"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignBaseline="@+id/accelerometertext"
-          android:layout_alignBottom="@+id/zbox"
-          android:layout_toLeftOf="@+id/zbox"
-          android:text="c" />
-
       <EditText
           android:id="@+id/IpText"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_alignParentBottom="true"
-          android:layout_toLeftOf="@+id/buttonRight"
-          android:layout_toRightOf="@+id/textAudio" >
+          android:layout_alignParentLeft="true"
+          android:layout_toLeftOf="@+id/textVideo" >
 
           <requestFocus />
       </EditText>
@@ -220,9 +144,57 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_alignParentBottom="true"
-          android:layout_alignRight="@+id/textBuzzer"
-          android:text="Connect" 
-          android:onClick="onbuttonConnect"/>
+          android:layout_alignParentRight="true"
+          android:layout_toRightOf="@+id/button1"
+          android:onClick="onbuttonConnect"
+          android:text="Connect" />
+
+      <ToggleButton
+          android:id="@+id/Accelerometer"
+          android:layout_width="40dp"
+          android:layout_height="wrap_content"
+          android:layout_above="@+id/textVideo"
+          android:layout_alignParentLeft="true"
+          android:layout_marginLeft="20dp"
+          android:onClick="buttonAccelerometer" />
+
+      <TextView
+          android:id="@+id/accelerometertext"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_above="@+id/buttonUp"
+          android:layout_alignParentLeft="true"
+          android:text="Acceleromter"
+          android:textAppearance="?android:attr/textAppearanceSmall" />
+
+      <Button
+          android:id="@+id/button1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignLeft="@+id/textVideo"
+          android:layout_alignParentBottom="true"
+          android:onClick="onButtonDisconnect"
+          android:text="Disconnect" />
+
+      <Button
+          android:id="@+id/button2"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_above="@+id/connectbutton"
+          android:layout_alignLeft="@+id/button1"
+          android:layout_alignParentRight="true"
+          android:onClick="startSMSAlert"
+          android:text="Enable SMS Alert" />
+
+      <Button
+          android:id="@+id/button3"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_above="@+id/IpText"
+          android:layout_alignParentLeft="true"
+          android:layout_toLeftOf="@+id/button2"
+          android:text="Stop Robot"
+          android:onClick="stopRobot" />
 
   </RelativeLayout>
 

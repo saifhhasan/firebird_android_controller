@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import project.robot.BluetoothConnection;
 import android.os.AsyncTask;
 
 public class TCPServer extends AsyncTask<Void, Integer, Void> {
@@ -20,6 +21,8 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 	boolean videoFlag;	//Used to toggle video
 	private VideoThread vthread;	//Video Thread Object
 	
+	public static BluetoothConnection conn;
+	
 	/*
 	 * Starts a TCP Server which listens to incoming connections
 	 */
@@ -29,28 +32,9 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 		vthread = null;
 	}
 	
-	
-	/*
-	 * Stops the server process
-	 */
-	public void stop() {
-		System.out.println("TCPServer: Stopping server");
-		flag = false;
-		if(serverSocket != null) {
-			try {
-				serverSocket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("TCPServer: Error while closing socket");
-			}
-			serverSocket = null;
-		}
-	}
-	
 	@Override
 	protected Void doInBackground(Void... arg0) {
-		int msg;
+		int msg;	
 		
 		//Initiating server socket
 		try {
@@ -58,6 +42,7 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 			flag = true;
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
+			System.out.println("Tcpserver: unable to bind socket");
 			e1.printStackTrace();
 			flag = false;
 		}
@@ -76,6 +61,18 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 				out = new DataOutputStream(clientSocket.getOutputStream());
 				msg = 1;
 				
+				//Start VideoThread
+				try {
+					vthread = new VideoThread(clientIP);
+					vthread.startVideo();
+					System.out.println("TCPServer: Video started");
+					videoFlag = true;
+				} catch (Exception e) {
+					e.printStackTrace();
+					vthread = null;
+					System.out.println("TCPServer: Error while starting video");
+				}
+				
 				//Reading input commands and signaling processing function
 				while(flag && msg != 0) {
 					msg = in.readInt();
@@ -83,8 +80,11 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 				}
 				
 				//Stopping video streaming if running
-				if(videoFlag)
-					toggleVideo();
+				if(vthread != null) {
+					vthread.stopVideo();
+					vthread = null;
+				}
+				System.out.println("TCPServer: Video stopped");
 				
 				//Closing Connection to client
 				clientSocket.close();
@@ -96,15 +96,8 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 				if(clientSocket != null) {
 					clientSocket = null;
 				}
-			}
-			
-			if(serverSocket != null) {
-				try {
-					serverSocket.close();
-				} catch (IOException e) {
-					System.out.println("TCPServer: Error while closing socket");
-				}
-				serverSocket = null;
+				flag = false;
+				System.out.println("TCPServer: Error while accepting or closing client connection");
 			}
 		}
 		
@@ -112,49 +105,68 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 		if(serverSocket != null) {
 			try {
 				serverSocket.close();
+				System.out.println("TCPServer: Server Socket Closed");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.out.println("TCPServer: Error while closing socket");
 			}
 			serverSocket = null;
 		}
+		
 		System.out.println("TCPServer: Server stopped");
 		return null;
 	}
 	
+	private void sendSignal(int signal) {
+		if(conn != null)
+			conn.send(signal);
+		else
+			System.out.println("TCPServer: null conn, can't send value");
+	}
+	
+	
 	@Override
 	protected void onProgressUpdate(Integer... integers) {
 		//Method is called every time a publishProgress is called from doInBackground
-		switch(integers[0]) {
-		case 2:
-			//Move forward
-			//send signal to robot with value 2
-			break;
-		case 4:
-			//Move right
-			//send signal to robot with value 4
-			break;
-		case 5:
-			//Stop
-			//send signal to robot with value 5 to stop it
-			break;
-		case 6:
-			//Move right
-			//Send signal to robot with value 6
-			break;
-		case 7:
-			//Buzzer toggle
-			//Send signal to toggle buzzer
-			break;
-		case 8:
-			//Move forward
-			break;
-		case 9:
-			toggleVideo();
-			break;
-		default:
-			System.out.println("TCPServer: Unrecognized instruction : " + integers[0]);
+		for(Integer integer : integers) {
+			System.out.println("TCPServer: Message received - " + integer);
+			switch(integer) {
+			case 1:
+				//Enable SMS service
+				if(vthread != null)
+					vthread.msgFlag = true;
+				break;
+			case 2:
+				//Move backward
+				sendSignal(2);
+				break;
+			case 4:
+				//Move left
+				sendSignal(4);
+				break;
+			case 5:
+				//Stop
+				sendSignal(5);
+				break;
+			case 6:
+				//Move right
+				sendSignal(6);
+				break;
+			case 7:
+				//Buzzer toggle
+				sendSignal(7);
+			case 8:
+				//Move forward
+				sendSignal(8);
+				break;
+			case 9:
+				//Toggle Video
+				toggleVideo();
+				break;
+			default:
+				System.out.println("TCPServer: Unrecognized instruction : " + integers[0]);
+				break;
+			}
 		}
 	}
 	
@@ -165,29 +177,43 @@ public class TCPServer extends AsyncTask<Void, Integer, Void> {
 	 */
 	private void toggleVideo() {
 		//If videoFlag is true then stop Video else start video
-		if(videoFlag) {
-			if(vthread != null) {
-				vthread.stopVideo();
-				vthread = null;
-			}
-			System.out.println("TCPServer: Video stopped");
-			videoFlag = false;
+		if(vthread==null)
+			return;
+		
+		if(vthread.videoStream) {
+			vthread.videoStream = false;
+			System.out.println("TCPServer: Video streamming stopped");
 		} else {
-			if(vthread != null) {
-				vthread.stopVideo();
-				vthread = null;
-			}
+			System.out.println("TCPServer: Video streamming started");
+			vthread.videoStream = true;
+		}
+	}
+	
+	
+	/*
+	 * `s the server process
+	 */
+	public void stop() {
+		System.out.println("TCPServer: Stopping server");
+		flag = false;
+		
+		//Stopping video if it is running
+		if(vthread != null) {
+			vthread.stopVideo();
+			vthread = null;
+		}
+		System.out.println("TCPServer: Video stopped");
+		
+		//Closing server socket
+		if(serverSocket != null) {
 			try {
-				vthread = new VideoThread(clientIP);
-				vthread.startVideo();
-				System.out.println("TCPServer: Video started");
-				videoFlag = true;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				serverSocket.close();
+				System.out.println("TCPServer: Server Socket Closed");
+			} catch (IOException e) {
 				e.printStackTrace();
-				vthread = null;
-				System.out.println("TCPServer: Error while starting video");
+				System.out.println("TCPServer: Error while closing socket");
 			}
+			serverSocket = null;
 		}
 	}
 }

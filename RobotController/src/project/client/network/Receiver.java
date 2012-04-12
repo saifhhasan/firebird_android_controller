@@ -23,6 +23,10 @@ public class Receiver {
         list = new ArrayList<DataFragment>();
         header = new int[4];
     }
+    
+    public void close() {
+    	socket.close();
+    }
 
     public byte[] recievePacket() {
         byte[] retdata;

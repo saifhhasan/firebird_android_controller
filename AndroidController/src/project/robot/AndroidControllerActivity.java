@@ -5,51 +5,47 @@ import project.robot.network.VideoThread;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import controller.gui.R;
 
 public class AndroidControllerActivity extends Activity {
 	VideoThread vthread;
-	//private EditText ipaddress;
 	private TCPServer server;
+	public int msg;
+	public boolean buzzer;
+	public int count;
+	BluetoothConnection conn;
+	
 	
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.main);
-        //ipaddress = (EditText)this.findViewById(R.id.ipText);
+        conn = new BluetoothConnection("00:19:A4:02:C6:7E"); //pararth ka mac
+        if(conn.connected)
+        	TCPServer.conn = conn;
+        else
+        	TCPServer.conn = null;
+        count = 0;
     }
     
     /*
-    public void handleClick(View v) {
-    	String ip = ipaddress.getText().toString();
-    	try {
-			vthread = new VideoThread(ip);
-			vthread.startVideo();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-    
-    public void stopVideo(View v) {
-    	if(vthread!=null) {
-    		vthread.stopVideo();
-    		vthread = null;
-    	}
-    }
-    */
-    
+     * Starts a TCPServer socket, which starts listening to incoming connections
+     * Allocates required resources for video streaming
+     */
     public void startServer(View v) {
+    	if(server != null)
+    		stopServer(v);
 		server = new TCPServer(8655);
 		server.execute(null);
     }
     
+    /*
+     * Stops TCPServer socket and releases all held resources
+     */
     public void stopServer(View v) {
-    	server.stop();
-    }
+    	if(server != null)
+    		server.stop();
+    	server = null;
+    }    
 }

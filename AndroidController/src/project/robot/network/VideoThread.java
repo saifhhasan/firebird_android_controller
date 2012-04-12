@@ -1,9 +1,14 @@
 package project.robot.network;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
 import java.net.SocketException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 
+import project.robot.MotionDetector;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
@@ -24,10 +29,33 @@ public class VideoThread {
 	int imgWidth, imgHeight;
 	int[] rgbData;
 	
+	MotionDetector detector;
+	boolean msgFlag;
+	public boolean videoStream;
+	
 	public VideoThread(String ip1) {
 		sender = null;
 		camera = null;
 		ip = ip1;
+		detector = new MotionDetector();
+		msgFlag = true;
+		videoStream = false;
+	}
+	
+	private void sendSMSAlert() {
+		try {
+			URLConnection conn = new URL("http://home.iitb.ac.in/~saifhhasan/sms.php?alert=Motion%20activity%20detected%20by%20your%20android%20phone").openConnection();
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line;
+			System.out.println("VideoThread: Printing response got from server");
+			while((line = in.readLine()) != null) {
+				System.out.println(line);
+			}
+			in.close();
+		} catch (Exception e) {
+			System.out.println("VideoThread: Error while sending sms alert");
+			e.printStackTrace();
+		}
 	}
 	
 	public void stopVideo() {
@@ -45,10 +73,10 @@ public class VideoThread {
 	
 	public void startVideo() throws UnknownHostException, SocketException {
 		sender = new Sender(ip, 8656);
-		camera = Camera.open();        
+		camera = Camera.open();
 		Camera.Parameters parameters = camera.getParameters(); 
 		parameters.setPreviewSize(480, 320);
-		parameters.setPreviewFrameRate(1);
+		parameters.setPreviewFrameRate(10);
 		//parameters.setPictureFormat(ImageFormat.JPEG);
 		parameters.setSceneMode(Camera.Parameters.SCENE_MODE_SPORTS);
 		parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
@@ -65,7 +93,7 @@ public class VideoThread {
 		bitmap = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.RGB_565);
 	}
 	
-	private class camPreviewCallback implements PreviewCallback {
+	class camPreviewCallback implements PreviewCallback {
 		public void onPreviewFrame(byte[] arg0, Camera arg1) {
 			// TODO Auto-generated method stub
 			if(isVideoOn == false) {
@@ -73,19 +101,31 @@ public class VideoThread {
 				return;
 			}
 			else {
-				decodeYUV420SP(rgbData, arg0, imgWidth, imgHeight);
+				decodeYUV420SP(rgbData, arg0, imgWidth, imgHeight);				
 				bitmap.setPixels(rgbData, 0, imgWidth, 0, 0, imgWidth, imgHeight);
 				
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+				if(videoStream) {
+					ByteArrayOutputStream stream = new ByteArrayOutputStream();
+					bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+					
+					sender.sendPacket(stream.toByteArray());
+					//System.out.println("VideoThread: packet sent ..");
+				}
 				
-				System.out.println("Sending packet: " + stream.toByteArray().length);
-				sender.sendPacket(stream.toByteArray());
-				
-				//sender.sendPacket(arg0);
+				if(msgFlag && detector.detectMotion(rgbData)) {
+					//Sending sms alert in thread so video streaming is not affected
+					new Thread() {
+						public void run() {
+							sendSMSAlert();
+						}
+					}.start();
+					msgFlag = false;
+					System.out.println("VideoThread: sms sent");
+				}
 			}
 		}
 	}
+	
 	
 	/* function converting image to RGB format taken from project: ViewfinderEE368  
 	 * http://www.stanford.edu/class/ee368/Android/ViewfinderEE368/

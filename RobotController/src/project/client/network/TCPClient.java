@@ -27,16 +27,34 @@ public class TCPClient {
 		in = new DataInputStream(socket.getInputStream());
 	}
 	
-	public void send(int msg) {
+	public boolean send(int msg) {
 		try {
 			out.writeInt(msg);
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("TCPSender: Unable to send command : " + msg);
+			return false;
 		}
 	}
 	
-	public void receive(byte[] buf) {
-		//For now not needed as such
+	public int receive() {
+		
+		return 0;
+	}
+	
+	public void close() {
+		if(socket != null) {
+			try {
+				socket.close();
+				System.out.println("TCPClient: TCP Socket closed");
+			} catch (IOException e) {
+				System.out.println("TCPClient: Error while closing tcp socket");
+				e.printStackTrace();
+			}
+			socket = null;
+			in = null;
+			out = null;
+		}
 	}
 }
