@@ -27,6 +27,9 @@ public class TCPClient {
 		in = new DataInputStream(socket.getInputStream());
 	}
 	
+	/*
+	 * Sends msg to remote connected Server
+	 */
 	public boolean send(int msg) {
 		try {
 			out.writeInt(msg);
@@ -38,11 +41,16 @@ public class TCPClient {
 		}
 	}
 	
+	/*
+	 * Not implemented yet cause it was not required
+	 */
 	public int receive() {
-		
 		return 0;
 	}
 	
+	/*
+	 * Closes existing connection and releases socket
+	 */
 	public void close() {
 		if(socket != null) {
 			try {

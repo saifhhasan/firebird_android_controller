@@ -27,7 +27,6 @@ class DataFragment implements Comparable<DataFragment> {
     }
     
     public int compareTo(DataFragment another) {
-        // TODO Auto-generated method stub
         int seqNo2 = another.seqNo;
         if(seqNo > seqNo2)
             return 1;

@@ -7,6 +7,10 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * This is an abstract Receiver, which receives the packets sent by Sender.
+ * Arbitrary length packets can be sent by sender and received by Receiver.
+ */
 public class Receiver {
     DatagramSocket socket;
     DatagramPacket packet;
@@ -16,6 +20,9 @@ public class Receiver {
     List<DataFragment> list;
     byte[] dgramBuffer;
 
+    /*
+     * Initiate UDP Socket for listening to input datagrams
+     */
     public Receiver(int port) throws SocketException {
         socket = new DatagramSocket(port);
         dgramBuffer = new byte[DGRAM_MAX_LENGTH];
@@ -24,10 +31,16 @@ public class Receiver {
         header = new int[4];
     }
     
+    /*
+     * Closes associated socket
+     */
     public void close() {
     	socket.close();
     }
 
+    /*
+     * Tries to receive packet sent by sender. Comments are inline
+     */
     public byte[] recievePacket() {
         byte[] retdata;
         byte[] bytes;     

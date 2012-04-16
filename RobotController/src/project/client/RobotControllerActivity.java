@@ -11,6 +11,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import controller.gui.R;
 
+
+/*
+ * Main UI Class for RobotController Application.
+ * We haven't integrated accelerometer yet, but it could be easily setup
+ */
 public class RobotControllerActivity extends Activity {
 	
 	private int toggleVideo;
@@ -36,8 +41,10 @@ public class RobotControllerActivity extends Activity {
         client = null;
     }
     
+    /*
+     * Called whenever UP button is clicked, it sends 8 for Forward movement
+     */
     public void onButtonUpClicked(View v) {
-        // Do something when the button is clicked
     	if(toggleAccelerometer == -1) {
     		return;
     	} else {
@@ -46,8 +53,10 @@ public class RobotControllerActivity extends Activity {
     	}
     }
     
+    /*
+     * Called whenever RIGHT button is clicked, it sends 6 for Forward movement
+     */
     public void onButtonRightClicked(View v) {
-        // Do something when the button is clicked
     	if(toggleAccelerometer == -1){
     		return;
     	} else {
@@ -56,6 +65,9 @@ public class RobotControllerActivity extends Activity {
     	}
     }
     
+    /*
+     * Called whenever LEFT button is clicked, it sends 4 for Forward movement
+     */
     public void onButtonLeftClicked(View v) {
     	if(toggleAccelerometer ==  -1){
     		return;
@@ -65,6 +77,9 @@ public class RobotControllerActivity extends Activity {
     	}    	
     }
     
+    /*
+     * Called whenever DOWN button is clicked, it sends 2 for Forward movement
+     */
     public void onButtonDownClicked(View v) {
     	if(toggleAccelerometer  == -1) {
     		return;
@@ -74,6 +89,10 @@ public class RobotControllerActivity extends Activity {
     	}
     }
     
+    /*
+     * Toggles video. If video was not running then it starts video streaming
+     * else it stops the video streaming. (also allocates and releases required resources for video streaming)
+     */
     public void onToggleVideo(View v){
     	if(sendCommand(9))
     		toggleVideo *= -1;
@@ -97,6 +116,9 @@ public class RobotControllerActivity extends Activity {
      	}
     }
     
+    /*
+     * Called whenever BUZZER toggle button is clicked, it sends 7 which enables buzzer on robot
+     */
     public void onToggleBuzzer(View v){
     	if(sendCommand(7))
     		toggleBuzzer *= -1;
@@ -106,6 +128,10 @@ public class RobotControllerActivity extends Activity {
     		Toast.makeText(RobotControllerActivity.this, "Buzzer Off", Toast.LENGTH_SHORT).show();
     }
     
+    /*
+     * Called whenever SMS Alert button is clicked, it sends 1 which enables Motion Detector on ROBOT.
+     * Whenever motion is detected SMS will come to registered user
+     */
     public void startSMSAlert(View v) {
     	if(sendCommand(1))
     		Toast.makeText(RobotControllerActivity.this, "SMS Alert Enabled", Toast.LENGTH_SHORT).show();
@@ -113,10 +139,38 @@ public class RobotControllerActivity extends Activity {
     		Toast.makeText(RobotControllerActivity.this, "Couldn't Enable SMS Alert", Toast.LENGTH_SHORT).show();
     }
     
+    /*
+     * Stops the robot by sending 5 to the remote android phone
+     */
+    public void stopRobot(View v) {
+    	if(sendCommand(5)) {
+    		Toast.makeText(RobotControllerActivity.this, "Robot Stopped", Toast.LENGTH_SHORT).show();
+    	} else {
+    		Toast.makeText(RobotControllerActivity.this, "Unable to stop the robot", Toast.LENGTH_SHORT).show();
+    	}
+    }
+    
+    /*
+     * Tries to sends msg as int to remote android phone,
+     * if succeeds then return true else return false
+     */
+    public boolean sendCommand(int msg) {
+    	if(client != null && client.send(msg))
+    		return true;
+    	else
+    		return false;
+    }
+    
+    /*
+     * For now we haven't implemented this. But this can be easily implemented
+     */
     public void buttonAccelerometer(View v){
     	toggleAccelerometer *= -1;
     }
     
+    /*
+     * Tries to connect to remote TCPServer
+     */
     public void onbuttonConnect(View v){    	
     	String ip = ipaddress.getText().toString();
     	try {
@@ -128,28 +182,13 @@ public class RobotControllerActivity extends Activity {
 		}
     }
     
+    /*
+     * Closes connection with remove TCP Server
+     */
     public void onButtonDisconnect(View v) {
     	if(client != null) {
     		client.close();
     		client = null;
     	}
-    }
-    
-    public void stopRobot(View v) {
-    	if(sendCommand(5)) {
-    		Toast.makeText(RobotControllerActivity.this, "Robot Stopped", Toast.LENGTH_SHORT).show();
-    	} else {
-    		Toast.makeText(RobotControllerActivity.this, "Unable to stop the robot", Toast.LENGTH_SHORT).show();
-    	}
-    }
-    
-    /*
-     * Sends msg to another android phone
-     */
-    public boolean sendCommand(int msg) {
-    	if(client != null && client.send(msg))
-    		return true;
-    	else
-    		return false;
     }
 }

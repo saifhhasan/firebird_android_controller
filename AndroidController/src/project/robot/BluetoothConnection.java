@@ -1,6 +1,5 @@
 package project.robot;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 
@@ -8,6 +7,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
+/*
+ * Creates a bluetooth Connection to module Identified by specified MAC Address
+ * Has functionality to send byte to connected device
+ */
 public class BluetoothConnection {
 	private String macAddress;
 	public boolean connected;
@@ -16,6 +19,11 @@ public class BluetoothConnection {
 	private BluetoothDevice device;
 	private OutputStream out;
 	
+	
+	/*
+	 * Constructor: Tries to connect to device, if success then sets connected to true
+	 * else it sets connected to false
+	 */
 	public BluetoothConnection(String mac) {
 		macAddress = mac;
 		this.socket = null;
@@ -30,12 +38,14 @@ public class BluetoothConnection {
 			return;
 		}
 		
+		//Searching for device
 		device = adapter.getRemoteDevice(macAddress);
 		if(device == null) {
 			System.out.println("BluetoothConnection: null device, can't find device with specified macAddress");
 			return;
 		}
 		
+		//Creating socket from method
 		Method method;
 		try {
 			method = device.getClass().getMethod("createRfcommSocket",new Class[] { int.class });
@@ -46,6 +56,7 @@ public class BluetoothConnection {
 			return;
 		}
 		
+		//Trying to connect to socket
 		try {
 			socket.connect();
 		} catch (Exception e) {
@@ -56,6 +67,7 @@ public class BluetoothConnection {
 		
 		System.out.println("BluetoothConnection: Socket connected");
 		
+		//Getting Outputstream from socket
 		try {
 			out = socket.getOutputStream();
 		} catch (Exception e) {
@@ -68,6 +80,9 @@ public class BluetoothConnection {
 		connected = true;
 	}
 	
+	/*
+	 * Sends the last 8 bits of value to the connected device in raw format
+	 */
 	public void send(int value) {
 		int msg = (int) (0xff & value);
 		try {
@@ -79,6 +94,10 @@ public class BluetoothConnection {
 		}
 	}
 	
+	/*
+	 * Closes existing bluetooth Connection.
+	 * Release held resources
+	 */
 	public void close() {
 		try {
 			if(out != null)

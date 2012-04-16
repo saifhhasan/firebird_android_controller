@@ -18,7 +18,6 @@ import android.hardware.Camera.PreviewCallback;
  * It sends video using UDP Protocol and compress each image
  * to JPEG format
  */
-
 public class VideoThread {
 	Camera camera;
 	Sender sender;
@@ -30,8 +29,8 @@ public class VideoThread {
 	int[] rgbData;
 	
 	MotionDetector detector;
-	boolean msgFlag;
-	public boolean videoStream;
+	boolean msgFlag;	//Motion detection flag
+	public boolean videoStream;	//Video Stream Flag
 	
 	public VideoThread(String ip1) {
 		sender = null;
@@ -94,24 +93,29 @@ public class VideoThread {
 	}
 	
 	class camPreviewCallback implements PreviewCallback {
+		
+		//Called every time whenever a new frame is generated
 		public void onPreviewFrame(byte[] arg0, Camera arg1) {
-			// TODO Auto-generated method stub
 			if(isVideoOn == false) {
 				System.out.println("camPreviewClallback: camera is disabled");
 				return;
 			}
 			else {
-				decodeYUV420SP(rgbData, arg0, imgWidth, imgHeight);				
+				//Convert byte array into RGB Color values
+				decodeYUV420SP(rgbData, arg0, imgWidth, imgHeight);
+				//Sets up bitmap with data
 				bitmap.setPixels(rgbData, 0, imgWidth, 0, 0, imgWidth, imgHeight);
 				
 				if(videoStream) {
 					ByteArrayOutputStream stream = new ByteArrayOutputStream();
+					//Apply compression
 					bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
 					
+					//Gets bytes from bitmap
 					sender.sendPacket(stream.toByteArray());
-					//System.out.println("VideoThread: packet sent ..");
 				}
 				
+				//This is used for motion detection
 				if(msgFlag && detector.detectMotion(rgbData)) {
 					//Sending sms alert in thread so video streaming is not affected
 					new Thread() {

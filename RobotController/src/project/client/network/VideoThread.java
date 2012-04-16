@@ -7,12 +7,19 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+/*
+ * This is asyncTask in which doInBackground function runs in separate thread and
+ * on ProgressUpadate is called by main UI thread so that it can update UI
+ */
 public class VideoThread extends AsyncTask<Void, Bitmap, Void> {
 	Receiver receiver;
 	ImageView display;
 	Bitmap bitmap;
 	boolean flag;
 	
+	/*
+	 * Initiate class object and sets global parameters
+	 */
 	public VideoThread(ImageView display) throws SocketException {
 		receiver = new Receiver(8656);
 		display.setAdjustViewBounds(true);
@@ -22,7 +29,9 @@ public class VideoThread extends AsyncTask<Void, Bitmap, Void> {
 		flag = false;
 	}
 	
-	
+	/*
+	 * Stops video thread
+	 */
 	public void stop() {
 		flag = false;
 		if(receiver != null)
@@ -54,10 +63,7 @@ public class VideoThread extends AsyncTask<Void, Bitmap, Void> {
 	
 	
 	@Override
-	protected void onProgressUpdate(Bitmap... bitmaps) {
-		System.out.println("Height: " + bitmaps[0].getHeight());
-		System.out.println("Width: " + bitmaps[0].getWidth());
-		
+	protected void onProgressUpdate(Bitmap... bitmaps) {		
 		for(Bitmap bitmap : bitmaps) {
 			display.setImageBitmap(bitmaps[0]);
 		}
